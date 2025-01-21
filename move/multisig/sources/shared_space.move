@@ -52,12 +52,15 @@ module multisig::shared_space {
         );
     }
 
+    /// Takes a SharedSpace object, along with the indexes and signatures of the public keys that have signed it.
+    /// Verifies the signatures and returns a MemberProof verifying the participants that have signed the shared space.
     public fun proove_membership(shared_space: &mut SharedSpace, indexes: vector<u8>, signatures: vector<vector<u8>>): MemberProof {
 
         let (mut i, len) = (0, indexes.length());
         assert!(len == signatures.length(), ELengthMismatch);
         let serialized = bcs::to_bytes(shared_space);
         let msg = hash::blake2b256(&serialized);
+        shared_space.counter = shared_space.counter + 1;
 
         while (i < len) {
             let index = indexes[i];
